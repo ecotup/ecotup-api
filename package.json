@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/KelvinChand/ecotup-api/issues"
   },
-  "homepage": "https://github.com/KelvinChand/ecotup-api#readme"
+  "homepage": "https://github.com/KelvinChand/ecotup-api#readme",
+  "dependencies": {
+    "eslint": "^8.51.0",
+    "knex": "^3.0.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^3.0.1"
+  }
 }
