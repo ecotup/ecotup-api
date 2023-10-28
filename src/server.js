@@ -1,10 +1,14 @@
 const express = require("express");
 const cors = require("cors");
+const bodyParser = require("body-parser");
 const app = express();
-const port = process.env.PORT_1 || process.env.PORT_2;
+const port = process.env.PORT|| 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true,
+}));
 
 app.use("/api/users", require("./routes/user_routes"));
 

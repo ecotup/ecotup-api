@@ -20,12 +20,15 @@
   },
   "homepage": "https://github.com/KelvinChand/ecotup-api#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "joi": "^17.11.0",
     "knex": "^3.0.1",
     "mysql": "^2.18.1",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "eslint": "^8.51.0",

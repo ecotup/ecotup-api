@@ -11,6 +11,7 @@ exports.seed = async function(knex) {
             user_phone: "082178558890",
             user_location: "Jl Bangau 1073A Palembang, Sumatera Selatan",
             user_point: 0,
+            user_roles: "driver",
           },
           {
             user_id: 2,
@@ -20,6 +21,16 @@ exports.seed = async function(knex) {
             user_phone: "082178538795",
             user_location: "Jl Rajawali No.17 Palembang, Sumatera Selatan",
             user_point: 0,
+          },
+          {
+            user_id: 3,
+            user_name: "Rivaldo",
+            user_password: "12345R",
+            user_email: "Rivaldo@gmail.com",
+            user_phone: "082172418705",
+            user_location: "Jl Jendral Sudirman No.201 Palembang, Sumatera Selatan",
+            user_point: 0,
+            user_roles: "admin",
           },
         ]);
       });

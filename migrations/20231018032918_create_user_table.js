@@ -9,6 +9,7 @@ exports.up = function(knex) {
     table.string("user_profile");
     table.integer("user_point").defaultTo(0);
     table.string("user_token", 16);
+    table.string("user_roles", 6).defaultTo("user");
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table.timestamp("updated_at").defaultTo(knex.fn.now());
   });
