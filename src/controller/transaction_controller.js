@@ -2,19 +2,19 @@ const knex = require("knex");
 const knexfile = require("../../knexfile");
 const db = knex(knexfile.development);
 
-const getHistoryByIdController = async (req, res) => {
+const getTransactionByIdController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id history is required",
+      message: "Id transaction is required",
     });
   }
   try {
     const history = await db
         .select()
-        .from("tbl_history")
-        .where({ history_id: id })
+        .from("tbl_transaction")
+        .where({ user_id: id })
         .first();
     if (history) {
       res.status(200).json({
@@ -37,5 +37,5 @@ const getHistoryByIdController = async (req, res) => {
   }
 };
 module.exports = {
-  getHistoryByIdController,
+  getTransactionByIdController,
 };

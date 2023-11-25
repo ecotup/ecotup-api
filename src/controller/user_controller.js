@@ -17,18 +17,25 @@ const getAllUserController = async (req, res) => {
       error: true,
       message: "Internal server error",
     });
+    res.status(404).json({
+      error: true,
+      message: "Request not found",
+    });
   }
-  res.status(404).json({
-    error: true,
-    message: "Request not found",
-  });
 };
 const getUserByIdController = async (req, res) => {
   const { id } = req.params;
+  const token = req.headers;
   if (!id) {
     return res.status(400).json({
       error: true,
       message: "Id user is required",
+    });
+  }
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Token user is required",
     });
   }
   try {
@@ -76,11 +83,15 @@ const logInController = async (req, res) => {
     const user = await db
         .select()
         .from("tbl_user")
-        .where({ user_email: email })
+        .where({ user_email: email})
         .first();
     if (user) {
       const isPasswordValid = await bcrypt.compare(password, user.user_password);
       if (isPasswordValid) {
+        await db
+            .from("tbl_user")
+            .where({ user_id: user.user_id })
+            .update({ user_token: user_token });
         res.status(200).json({
           error: false,
           message: "Login successful",
@@ -110,7 +121,7 @@ const logInController = async (req, res) => {
   }
 };
 const signInController = async (req, res) => {
-  const { name, password, email, phone, location } = req.body;
+  const { name, password, email, phone, longitude, latitude } = req.body;
   const saltRounds = 10;
   if (!name) {
     return res.status(400).json({
@@ -136,10 +147,16 @@ const signInController = async (req, res) => {
       message: "Number phone user is required",
     });
   }
-  if (!location) {
+  if (!longitude) {
     return res.status(400).json({
       error: true,
-      message: "Location user is required",
+      message: "Longitude user is required",
+    });
+  }
+  if (!latitude) {
+    return res.status(400).json({
+      error: true,
+      message: "Latitude user is required",
     });
   }
   try {
@@ -149,7 +166,8 @@ const signInController = async (req, res) => {
       user_password: hashPassword,
       user_email: email,
       user_phone: phone,
-      user_location: location,
+      user_longitude: longitude,
+      user_latitude: latitude,
     };
     const user = await db("tbl_user").insert(newData);
     if (user) {
@@ -173,7 +191,7 @@ const signInController = async (req, res) => {
 };
 const updateUserController = async (req, res) => {
   const { id } = req.params;
-  const { name, email, phone, location } = req.body;
+  const { name, email, phone, longitude, latitude } = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
@@ -198,18 +216,14 @@ const updateUserController = async (req, res) => {
       message: "Number phone user is required",
     });
   }
-  if (!location) {
-    return res.status(400).json({
-      error: true,
-      message: "Location user is required",
-    });
-  }
   try {
     const updateData = {
       user_name: name,
       user_email: email,
       user_phone: phone,
-      user_location: location,
+      user_longitude: longitude,
+      user_latitude: latitude,
+      updated_at: db.fn.now(),
     };
     const user = await db("tbl_user").where({ user_id: id }).update(updateData);
     if (user) {
@@ -251,6 +265,7 @@ const updateUserPasswordController = async (req, res) => {
     const hashPassword = await bcrypt.hash(password, saltRounds);
     const updateData = {
       user_password: hashPassword,
+      updated_at: db.fn.now(),
     };
     const user = await db("tbl_user").where({ user_id: id }).update(updateData);
     if (user) {
@@ -290,6 +305,7 @@ const updateUserRolesController = async (req, res) => {
   try {
     const updateData = {
       user_roles: roles,
+      updated_at: db.fn.now(),
     };
     const user = await db("tbl_user").where({ user_id: id }).update(updateData);
     if (user) {
@@ -311,6 +327,48 @@ const updateUserRolesController = async (req, res) => {
     });
   }
 };
+/*
+const updateUserSubscriptionController = async (req, res) => {
+  const { id } = req.params;
+  const { Subscription } = req.body;
+  if (!id) {
+    return res.status(400).json({
+      error: true,
+      message: "Id user is required",
+    });
+  }
+  if (!roles) {
+    return res.status(400).json({
+      error: true,
+      message: "Roles user is required",
+    });
+  }
+  try {
+    const updateData = {
+      user_roles: roles,
+      updated_at: db.fn.now(),
+    };
+    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
+    if (user) {
+      res.status(200).json({
+        error: false,
+        message: "Update user roles successful",
+      });
+    } else {
+      res.status(401).json({
+        error: true,
+        message: "Update user roles failed",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      error: true,
+      message: "Internal server error",
+      debug: error.message,
+    });
+  }
+};
+*/
 const deleteUserController = async (req, res) => {
   const { id } = req.params;
   if (!id) {

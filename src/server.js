@@ -11,7 +11,8 @@ app.use(bodyParser.urlencoded({
 }));
 
 app.use("/api/users", require("./routes/user_routes"));
-app.use("/api/history", require("./routes/history_routes"));
+app.use("/api/transaction", require("./routes/transaction_routes"));
+app.use("/api/subscription", require("./routes/subscription_routes"));
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
