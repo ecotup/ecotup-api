@@ -7,18 +7,20 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
     "start-dev": "nodemon src/server.js",
+    "start-prod": "pm2 start src/server.js",
+    "stop-prod": "pm2 stop src/server.js",
     "lint": "eslint ./src"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/KelvinChand/ecotup-api.git"
+    "url": "git+https://github.com/ecotup/ecotup-api.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/KelvinChand/ecotup-api/issues"
+    "url": "https://github.com/ecotup/ecotup-api/issues"
   },
-  "homepage": "https://github.com/KelvinChand/ecotup-api#readme",
+  "homepage": "https://github.com/ecotup/ecotup-api#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
@@ -28,6 +30,7 @@
     "knex": "^3.0.1",
     "mysql": "^2.18.1",
     "nodemon": "^3.0.1",
+    "pm2": "^5.3.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

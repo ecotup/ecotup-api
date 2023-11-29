@@ -4,13 +4,13 @@ const bcrypt = require("bcrypt");
 const knexfile = require("../../knexfile");
 const db = knex(knexfile.development);
 
-const getAllUserController = async (req, res) => {
+const getAllDriverController = async (req, res) => {
   try {
-    const users = await db.select().from("tbl_user");
+    const drivers = await db.select().from("tbl_driver");
     res.status(200).json({
       error: false,
       message: "Request successful",
-      data: users,
+      data: drivers,
     });
   } catch (error) {
     res.status(500).json({
@@ -23,32 +23,32 @@ const getAllUserController = async (req, res) => {
     });
   }
 };
-const getUserByIdController = async (req, res) => {
+const getDriverByIdController = async (req, res) => {
   const { id } = req.params;
   const token = req.headers;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id user is required",
+      message: "Id driver is required",
     });
   }
   if (!token) {
     return res.status(400).json({
       error: true,
-      message: "Token user is required",
+      message: "Token driver is required",
     });
   }
   try {
-    const user = await db
+    const driver = await db
         .select()
-        .from("tbl_user")
-        .where({ user_id: id})
+        .from("tbl_driver")
+        .where({ driver_id: id })
         .first();
-    if (user) {
+    if (driver) {
       res.status(200).json({
         error: false,
         message: "Request successful",
-        data: user,
+        data: driver,
       });
     } else {
       res.status(404).json({
@@ -64,40 +64,43 @@ const getUserByIdController = async (req, res) => {
     });
   }
 };
-const logInUserController = async (req, res) => {
+const logInDriverController = async (req, res) => {
   const { email, password } = req.body;
   if (!email) {
     return res.status(400).json({
       error: true,
-      message: "Email user is required",
+      message: "Email driver is required",
     });
   }
   if (!password) {
     return res.status(400).json({
       error: true,
-      message: "Password user is required",
+      message: "Password driver is required",
     });
   }
   try {
-    const user_token = uuidv4();
-    const user = await db
+    const driver_token = uuidv4();
+    const driver = await db
         .select()
-        .from("tbl_user")
-        .where({ user_email: email})
+        .from("tbl_driver")
+        .where({ driver_email: email })
         .first();
-    if (user) {
-      const isPasswordValid = await bcrypt.compare(password, user.user_password);
+    if (driver) {
+      const isPasswordValid = await bcrypt.compare(
+          password,
+          driver.driver_password,
+      );
       if (isPasswordValid) {
         await db
-            .from("tbl_user")
-            .where({ user_id: user.user_id })
-            .update({ user_token: user_token });
+            .from("tbl_driver")
+            .where({ driver_id: driver.driver_id })
+            .update({ driver_token: driver_token });
         res.status(200).json({
           error: false,
           message: "Login successful",
           data: {
-            id_user: user.user_id,
-            token: user_token,
+            id_driver: driver.driver_id,
+            token: driver_token,
           },
         });
       } else {
@@ -120,66 +123,80 @@ const logInUserController = async (req, res) => {
     });
   }
 };
-const signInUserController = async (req, res) => {
-  const { name, password, email, phone, longitude, latitude } = req.body;
+const signInDriverController = async (req, res) => {
+  const { name, password, email, phone, longitude, latitude, type, license} = req.body;
   const saltRounds = 10;
   if (!name) {
     return res.status(400).json({
       error: true,
-      message: "Name user is required",
+      message: "Name driver is required",
     });
   }
   if (!password) {
     return res.status(400).json({
       error: true,
-      message: "Password user is required",
+      message: "Password driver is required",
     });
   }
   if (!email) {
     return res.status(400).json({
       error: true,
-      message: "Email user is required",
+      message: "Email driver is required",
     });
   }
   if (!phone) {
     return res.status(400).json({
       error: true,
-      message: "Number phone user is required",
+      message: "Number phone driver is required",
     });
   }
   if (!longitude) {
     return res.status(400).json({
       error: true,
-      message: "Longitude user is required",
+      message: "Longitude driver is required",
     });
   }
   if (!latitude) {
     return res.status(400).json({
       error: true,
-      message: "Latitude user is required",
+      message: "Latitude driver is required",
+    });
+  }
+  if (!type) {
+    return res.status(400).json({
+      error: true,
+      message: "Type driver is required",
+    });
+  }
+  if (!license) {
+    return res.status(400).json({
+      error: true,
+      message: "License driver is required",
     });
   }
   try {
     const hashPassword = await bcrypt.hash(password, saltRounds);
     const data = {
-      user_name: name,
-      user_password: hashPassword,
-      user_email: email,
-      user_phone: phone,
-      user_longitude: longitude,
-      user_latitude: latitude,
+      driver_name: name,
+      driver_password: hashPassword,
+      driver_email: email,
+      driver_phone: phone,
+      driver_longitude: longitude,
+      driver_latitude: latitude,
+      driver_type: type,
+      driver_license: license,
       created_at: db.fn.now(),
     };
-    const user = await db("tbl_user").insert(data);
-    if (user) {
+    const driver = await db("tbl_driver").insert(data);
+    if (driver) {
       res.status(200).json({
         error: false,
-        message: "Register user successful",
+        message: "Register driver successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Register user failed",
+        message: "Register driver failed",
       });
     }
   } catch (error) {
@@ -190,52 +207,66 @@ const signInUserController = async (req, res) => {
     });
   }
 };
-const updateUserController = async (req, res) => {
+const updateDriverController = async (req, res) => {
   const { id } = req.params;
-  const { name, email, phone, longitude, latitude } = req.body;
+  const { name, email, phone, longitude, latitude, type, license } = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id user is required",
+      message: "Id driver is required",
     });
   }
   if (!name) {
     return res.status(400).json({
       error: true,
-      message: "Name user is required",
+      message: "Name driver is required",
     });
   }
   if (!email) {
     return res.status(400).json({
       error: true,
-      message: "Email user is required",
+      message: "Email driver is required",
     });
   }
   if (!phone) {
     return res.status(400).json({
       error: true,
-      message: "Number phone user is required",
+      message: "Number phone driver is required",
+    });
+  }
+  if (!type) {
+    return res.status(400).json({
+      error: true,
+      message: "Type driver is required",
+    });
+  }
+  if (!license) {
+    return res.status(400).json({
+      error: true,
+      message: "License driver is required",
     });
   }
   try {
     const updateData = {
-      user_name: name,
-      user_email: email,
-      user_phone: phone,
-      user_longitude: longitude,
-      user_latitude: latitude,
+      driver_name: name,
+      driver_email: email,
+      driver_phone: phone,
+      driver_longitude: longitude,
+      driver_latitude: latitude,
+      driver_type: type,
+      driver_license: license,
       updated_at: db.fn.now(),
     };
-    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
-    if (user) {
+    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    if (driver) {
       res.status(200).json({
         error: false,
-        message: "Update user successful",
+        message: "Update driver successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Update user failed",
+        message: "Update driver failed",
       });
     }
   } catch (error) {
@@ -246,36 +277,36 @@ const updateUserController = async (req, res) => {
     });
   }
 };
-const updateUserProfileController = async (req, res) => {
+const updatedriverProfileController = async (req, res) => {
   const { id } = req.params;
   const { profile } = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id user is required",
+      message: "Id driver is required",
     });
   }
   if (!profile) {
     return res.status(400).json({
       error: true,
-      message: "Profile user is required",
+      message: "Profile driver is required",
     });
   }
   try {
     const updateData = {
-      user_profile: profile,
+      driver_profile: profile,
       updated_at: db.fn.now(),
     };
-    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
-    if (user) {
+    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    if (driver) {
       res.status(200).json({
         error: false,
-        message: "Update user profile successful",
+        message: "Update driver profile successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Update user profile failed",
+        message: "Update driver profile failed",
       });
     }
   } catch (error) {
@@ -286,36 +317,36 @@ const updateUserProfileController = async (req, res) => {
     });
   }
 };
-const updateUserPointController = async (req, res) => {
+const updatedriverPointController = async (req, res) => {
   const { id } = req.params;
   const { point } = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id user is required",
+      message: "Id driver is required",
     });
   }
   if (!point) {
     return res.status(400).json({
       error: true,
-      message: "Point user is required",
+      message: "Point driver is required",
     });
   }
   try {
     const updateData = {
-      user_profile: profile,
+      driver_profile: profile,
       updated_at: db.fn.now(),
     };
-    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
-    if (user) {
+    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    if (driver) {
       res.status(200).json({
         error: false,
-        message: "Update user point successful",
+        message: "Update driver point successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Update user point failed",
+        message: "Update driver point failed",
       });
     }
   } catch (error) {
@@ -326,38 +357,38 @@ const updateUserPointController = async (req, res) => {
     });
   }
 };
-const updateUserPasswordController = async (req, res) => {
+const updateDriverPasswordController = async (req, res) => {
   const { id } = req.params;
   const { password } = req.body;
   const saltRounds = 10;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id user is required",
+      message: "Id driver is required",
     });
   }
   if (!password) {
     return res.status(400).json({
       error: true,
-      message: "Password user is required",
+      message: "Password driver is required",
     });
   }
   try {
     const hashPassword = await bcrypt.hash(password, saltRounds);
     const updateData = {
-      user_password: hashPassword,
+      driver_password: hashPassword,
       updated_at: db.fn.now(),
     };
-    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
-    if (user) {
+    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    if (driver) {
       res.status(200).json({
         error: false,
-        message: "Update user password successful",
+        message: "Update driver password successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Update user password failed",
+        message: "Update driver password failed",
       });
     }
   } catch (error) {
@@ -368,67 +399,25 @@ const updateUserPasswordController = async (req, res) => {
     });
   }
 };
-/*
-const updateUserSubscriptionController = async (req, res) => {
-  const { id } = req.params;
-  const { Subscription } = req.body;
-  if (!id) {
-    return res.status(400).json({
-      error: true,
-      message: "Id user is required",
-    });
-  }
-  if (!roles) {
-    return res.status(400).json({
-      error: true,
-      message: "Subscription user is required",
-    });
-  }
-  try {
-    const updateData = {
-      user_roles: Subscription,
-      updated_at: db.fn.now(),
-    };
-    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
-    if (user) {
-      res.status(200).json({
-        error: false,
-        message: "Update user roles successful",
-      });
-    } else {
-      res.status(401).json({
-        error: true,
-        message: "Update user roles failed",
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      error: true,
-      message: "Internal server error",
-      debug: error.message,
-    });
-  }
-};
-*/
-const deleteUserController = async (req, res) => {
+const deleteDriverController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id user is required",
+      message: "Id driver is required",
     });
   }
   try {
-    const user = await db("tbl_user").where({ user_id: id }).delete();
-    if (user) {
+    const driver = await db("tbl_driver").where({ driver_id: id }).delete();
+    if (driver) {
       res.status(200).json({
         error: false,
-        message: "Delete user successful",
+        message: "Delete driver successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Delete user failed",
+        message: "Delete driver failed",
       });
     }
   } catch (error) {
@@ -440,14 +429,13 @@ const deleteUserController = async (req, res) => {
   }
 };
 module.exports = {
-  signInUserController,
-  logInUserController,
-  getAllUserController,
-  getUserByIdController,
-  updateUserController,
-  updateUserProfileController,
-  updateUserPointController,
-  updateUserPasswordController,
-  // updateUserSubscriptionController,
-  deleteUserController,
+  signInDriverController,
+  logInDriverController,
+  getAllDriverController,
+  getDriverByIdController,
+  updateDriverController,
+  updatedriverProfileController,
+  updatedriverPointController,
+  updateDriverPasswordController,
+  deleteDriverController,
 };

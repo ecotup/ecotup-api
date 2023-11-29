@@ -5,7 +5,7 @@ exports.seed = async function(knex) {
         return knex("tbl_subscription").insert([
           {
             subscription_id: 1,
-            subscription_status: "Daily",
+            subscription_status: "One Time",
             subscription_value: 1,
           },
           {

@@ -2,13 +2,13 @@ const knex = require("knex");
 const knexfile = require("../../knexfile");
 const db = knex(knexfile.development);
 
-const getUserSubscriptionController = async (req, res) => {
+const getAllArticleController = async (req, res) => {
   try {
-    const subscription = await db.select().from("tbl_subscription");
+    const articles = await db.select().from("tbl_article");
     res.status(200).json({
       error: false,
       message: "Request successful",
-      data: subscription,
+      data: articles,
     });
   } catch (error) {
     res.status(500).json({
@@ -21,25 +21,25 @@ const getUserSubscriptionController = async (req, res) => {
     });
   }
 };
-const getSubscriptionByIdController = async (req, res) => {
+const getArticleByIdController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id subscription is required",
+      message: "Id article is required",
     });
   }
   try {
-    const subscription = await db
+    const article = await db
         .select()
-        .from("tbl_subscription")
-        .where({ subscription_id: id })
+        .from("tbl_article")
+        .where({ article_id: id })
         .first();
-    if (subscription) {
+    if (article) {
       res.status(200).json({
         error: false,
         message: "Request successful",
-        data: subscription,
+        data: article,
       });
     } else {
       res.status(404).json({
@@ -53,38 +53,47 @@ const getSubscriptionByIdController = async (req, res) => {
       message: "Internal server error",
       debug: error.message,
     });
-  };
+  }
 };
-const insertSubscriptionController = async (req, res) => {
-  const { status, value } = req.body;
-  if (!status) {
+const insertArticleController = async (req, res) => {
+  const { name, image, author, link, date } = req.body;
+  if (!name) {
     return res.status(400).json({
       error: true,
-      message: "Status subscription is required",
+      message: "Name article is required",
     });
   }
-  if (!value) {
+  if (!link) {
     return res.status(400).json({
       error: true,
-      message: "Value subscription is required",
+      message: "Link article is required",
+    });
+  }
+  if (!author) {
+    return res.status(400).json({
+      error: true,
+      message: "Author article is required",
     });
   }
   try {
     const data = {
-      subscription_status: status,
-      subscription_value: value,
+      article_name: name,
+      article_image: image,
+      article_link: link,
+      article_author: author,
+      article_date: date,
       created_at: db.fn.now(),
     };
-    const subscription = await db("tbl_subscription").insert(data);
-    if (subscription) {
+    const article = await db("tbl_article").insert(data);
+    if (article) {
       res.status(200).json({
         error: false,
-        message: "Register subscription successful",
+        message: "Register article successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Register subscription failed",
+        message: "Register article failed",
       });
     }
   } catch (error) {
@@ -95,45 +104,36 @@ const insertSubscriptionController = async (req, res) => {
     });
   }
 };
-const updateSubscriptionController = async (req, res) => {
+const updateArticleController = async (req, res) => {
   const { id } = req.params;
-  const { status, value } = req.body;
+  const { name, image, author, link, date } = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id subscription is required",
-    });
-  }
-  if (!status) {
-    return res.status(400).json({
-      error: true,
-      message: "Status subscription is required",
-    });
-  }
-  if (!value) {
-    return res.status(400).json({
-      error: true,
-      message: "Value subscription is required",
+      message: "Id article is required",
     });
   }
   try {
     const updateData = {
-      subscription_status: status,
-      subscription_value: value,
+      article_name: name,
+      article_image: image,
+      article_link: link,
+      article_author: author,
+      article_date: date,
       updated_at: db.fn.now(),
     };
-    const subscription = await db("tbl_subscription")
-        .where({ subscription_id: id })
+    const article = await db("tbl_article")
+        .where({ article_id: id })
         .update(updateData);
-    if (subscription) {
+    if (article) {
       res.status(200).json({
         error: false,
-        message: "Update subscription successful",
+        message: "Update article successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Update subscription failed",
+        message: "Update article failed",
       });
     }
   } catch (error) {
@@ -144,27 +144,25 @@ const updateSubscriptionController = async (req, res) => {
     });
   }
 };
-const deleteSubscriptionController = async (req, res) => {
+const deleteArticleController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id subscription is required",
+      message: "Id article is required",
     });
   }
   try {
-    const subscription = await db("tbl_subscription")
-        .where({ subscription_id: id })
-        .delete();
-    if (subscription) {
+    const article = await db("tbl_article").where({ article_id: id }).delete();
+    if (article) {
       res.status(200).json({
         error: false,
-        message: "Delete subscription successful",
+        message: "Delete article successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Delete subscription failed",
+        message: "Delete article failed",
       });
     }
   } catch (error) {
@@ -176,9 +174,9 @@ const deleteSubscriptionController = async (req, res) => {
   }
 };
 module.exports = {
-  getUserSubscriptionController,
-  getSubscriptionByIdController,
-  insertSubscriptionController,
-  updateSubscriptionController,
-  deleteSubscriptionController,
+  getAllArticleController,
+  getArticleByIdController,
+  insertArticleController,
+  updateArticleController,
+  deleteArticleController,
 };

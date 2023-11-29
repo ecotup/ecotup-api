@@ -4,21 +4,25 @@ const router = express.Router();
 const {
   getAllUserController,
   getUserByIdController,
-  logInController,
-  signInController,
+  logInUserController,
+  signInUserController,
   updateUserController,
+  updateUserProfileController,
+  updateUserPointController,
   updateUserPasswordController,
-  updateUserRolesController,
+  // updateUserSubscriptionController,
   deleteUserController,
 } = require("../controller/user_controller");
 
 router.get("/", getAllUserController);
 router.get("/detail/:id", getUserByIdController);
-router.post("/auth", logInController);
-router.post("/register", signInController);
+router.post("/login", logInUserController);
+router.post("/register", signInUserController);
 router.post("/update/:id", updateUserController);
+router.post("/update/profile/:id", updateUserProfileController);
+router.post("/update/point/:id", updateUserPointController);
 router.post("/update/password/:id", updateUserPasswordController);
-router.post("/update/roles/:id", updateUserRolesController);
+// router.post("/update/subscription/:id", updateUserSubscriptionController);
 router.delete("/delete/:id", deleteUserController);
 
 module.exports = router;

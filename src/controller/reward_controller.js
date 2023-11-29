@@ -2,13 +2,13 @@ const knex = require("knex");
 const knexfile = require("../../knexfile");
 const db = knex(knexfile.development);
 
-const getUserSubscriptionController = async (req, res) => {
+const getAllRewardController = async (req, res) => {
   try {
-    const subscription = await db.select().from("tbl_subscription");
+    const rewards = await db.select().from("tbl_reward");
     res.status(200).json({
       error: false,
       message: "Request successful",
-      data: subscription,
+      data: rewards,
     });
   } catch (error) {
     res.status(500).json({
@@ -21,25 +21,25 @@ const getUserSubscriptionController = async (req, res) => {
     });
   }
 };
-const getSubscriptionByIdController = async (req, res) => {
+const getRewardByIdController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id subscription is required",
+      message: "Id reward is required",
     });
   }
   try {
-    const subscription = await db
+    const reward = await db
         .select()
-        .from("tbl_subscription")
-        .where({ subscription_id: id })
+        .from("tbl_reward")
+        .where({ reward_id: id })
         .first();
-    if (subscription) {
+    if (reward) {
       res.status(200).json({
         error: false,
         message: "Request successful",
-        data: subscription,
+        data: reward,
       });
     } else {
       res.status(404).json({
@@ -53,38 +53,52 @@ const getSubscriptionByIdController = async (req, res) => {
       message: "Internal server error",
       debug: error.message,
     });
-  };
+  }
 };
-const insertSubscriptionController = async (req, res) => {
-  const { status, value } = req.body;
-  if (!status) {
+const insertRewardController = async (req, res) => {
+  const { name, image, price, description } = req.body;
+  if (!name) {
     return res.status(400).json({
       error: true,
-      message: "Status subscription is required",
+      message: "Name reward is required",
     });
   }
-  if (!value) {
+  if (!image) {
     return res.status(400).json({
       error: true,
-      message: "Value subscription is required",
+      message: "Image reward is required",
+    });
+  }
+  if (!price) {
+    return res.status(400).json({
+      error: true,
+      message: "Price reward is required",
+    });
+  }
+  if (!description) {
+    return res.status(400).json({
+      error: true,
+      message: "Description reward is required",
     });
   }
   try {
     const data = {
-      subscription_status: status,
-      subscription_value: value,
+      reward_image: image,
+      reward_name: name,
+      reward_price: price,
+      reward_description: description,
       created_at: db.fn.now(),
     };
-    const subscription = await db("tbl_subscription").insert(data);
-    if (subscription) {
+    const reward = await db("tbl_reward").insert(data);
+    if (reward) {
       res.status(200).json({
         error: false,
-        message: "Register subscription successful",
+        message: "Register reward successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Register subscription failed",
+        message: "Register reward failed",
       });
     }
   } catch (error) {
@@ -95,45 +109,59 @@ const insertSubscriptionController = async (req, res) => {
     });
   }
 };
-const updateSubscriptionController = async (req, res) => {
+const updateRewardController = async (req, res) => {
   const { id } = req.params;
-  const { status, value } = req.body;
+  const { name, image, price, description} = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id subscription is required",
+      message: "Id reward is required",
     });
   }
-  if (!status) {
+  if (!name) {
     return res.status(400).json({
       error: true,
-      message: "Status subscription is required",
+      message: "Name reward is required",
     });
   }
-  if (!value) {
+  if (!image) {
     return res.status(400).json({
       error: true,
-      message: "Value subscription is required",
+      message: "Image reward is required",
+    });
+  }
+  if (!price) {
+    return res.status(400).json({
+      error: true,
+      message: "Price reward is required",
+    });
+  }
+  if (!description) {
+    return res.status(400).json({
+      error: true,
+      message: "Description reward is required",
     });
   }
   try {
     const updateData = {
-      subscription_status: status,
-      subscription_value: value,
+      reward_name: name,
+      reward_image: image,
+      reward_price: price,
+      reward_description: description,
       updated_at: db.fn.now(),
     };
-    const subscription = await db("tbl_subscription")
-        .where({ subscription_id: id })
+    const reward = await db("tbl_reward")
+        .where({ reward_id: id })
         .update(updateData);
-    if (subscription) {
+    if (reward) {
       res.status(200).json({
         error: false,
-        message: "Update subscription successful",
+        message: "Update reward successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Update subscription failed",
+        message: "Update reward failed",
       });
     }
   } catch (error) {
@@ -144,27 +172,25 @@ const updateSubscriptionController = async (req, res) => {
     });
   }
 };
-const deleteSubscriptionController = async (req, res) => {
+const deleteRewardController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
     return res.status(400).json({
       error: true,
-      message: "Id subscription is required",
+      message: "Id reward is required",
     });
   }
   try {
-    const subscription = await db("tbl_subscription")
-        .where({ subscription_id: id })
-        .delete();
-    if (subscription) {
+    const reward = await db("tbl_reward").where({ reward_id: id }).delete();
+    if (reward) {
       res.status(200).json({
         error: false,
-        message: "Delete subscription successful",
+        message: "Delete reward successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Delete subscription failed",
+        message: "Delete reward failed",
       });
     }
   } catch (error) {
@@ -176,9 +202,9 @@ const deleteSubscriptionController = async (req, res) => {
   }
 };
 module.exports = {
-  getUserSubscriptionController,
-  getSubscriptionByIdController,
-  insertSubscriptionController,
-  updateSubscriptionController,
-  deleteSubscriptionController,
+  getAllRewardController,
+  getRewardByIdController,
+  insertRewardController,
+  updateRewardController,
+  deleteRewardController,
 };
