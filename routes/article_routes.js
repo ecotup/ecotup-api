@@ -12,7 +12,7 @@ const {
 router.get("/", getAllArticleController);
 router.get("/detail/:id", getArticleByIdController);
 router.post("/register", insertArticleController);
-router.post("/update/:id", updateArticleController);
+router.put("/update/:id", updateArticleController);
 router.delete("/delete/:id", deleteArticleController);
 
 module.exports = router;

@@ -12,7 +12,7 @@ const {
 router.get("/", getAllRewardController);
 router.get("/detail/:id", getRewardByIdController);
 router.post("/register", insertRewardController);
-router.post("/update/:id", updateRewardController);
+router.put("/update/:id", updateRewardController);
 router.delete("/delete/:id", deleteRewardController);
 
 module.exports = router;

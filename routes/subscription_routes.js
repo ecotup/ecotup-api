@@ -12,6 +12,6 @@ const {
 router.get("/", getUserSubscriptionController);
 router.get("/detail/:id", getSubscriptionByIdController);
 router.post("/register", insertSubscriptionController);
-router.post("/update/:id", updateSubscriptionController);
+router.put("/update/:id", updateSubscriptionController);
 router.delete("/delete/:id", deleteSubscriptionController);
 module.exports = router;

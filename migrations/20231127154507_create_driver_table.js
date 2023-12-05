@@ -12,6 +12,7 @@ exports.up = function(knex) {
         table.double("driver_longitude").notNullable();
         table.double("driver_latitude").notNullable();
         table.string("driver_type");
+        table.float("driver_rating").defaultTo(5.0);
         table.string("driver_license");
         table.string("driver_profile");
         table.integer("driver_point").defaultTo(0);

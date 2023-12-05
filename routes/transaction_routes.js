@@ -12,6 +12,6 @@ const {
 router.get("/", getAllTransactionController);
 router.get("/detail/:id", getTransactionByIdController);
 router.post("/register", insertTransactionController);
-router.post("/update/:id", updateTransactionController);
+router.put("/update/:id", updateTransactionController);
 router.delete("/delete/:id", deleteTransactionController);
 module.exports = router;

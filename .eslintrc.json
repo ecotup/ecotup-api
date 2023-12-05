@@ -16,6 +16,8 @@
     "no-unused-vars": "off",
     "quotes": "off",
     "new-cap": "off",
-    "camelcase":"off"
+    "camelcase":"off",
+    "prefer-const":"off",
+    "require-jsdoc":"off"
   }
 }

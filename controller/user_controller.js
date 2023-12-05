@@ -1,25 +1,28 @@
 const { v4: uuidv4 } = require("uuid");
 const knex = require("knex");
 const bcrypt = require("bcrypt");
-const knexfile = require("../../knexfile");
+const knexfile = require("../knexfile");
 const db = knex(knexfile.development);
-
 const getAllUserController = async (req, res) => {
   try {
     const users = await db.select().from("tbl_user");
-    res.status(200).json({
-      error: false,
-      message: "Request successful",
-      data: users,
-    });
+    if (users) {
+      return res.status(200).json({
+        error: false,
+        message: "Request successful",
+        data: users,
+      });
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "Request not found",
+      });
+    }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
-    });
-    res.status(404).json({
-      error: true,
-      message: "Request not found",
+      debug: error.message,
     });
   }
 };
@@ -42,22 +45,22 @@ const getUserByIdController = async (req, res) => {
     const user = await db
         .select()
         .from("tbl_user")
-        .where({ user_id: id})
+        .where({ user_id: id })
         .first();
     if (user) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Request successful",
         data: user,
       });
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         error: true,
         message: "Request not found",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -83,16 +86,19 @@ const logInUserController = async (req, res) => {
     const user = await db
         .select()
         .from("tbl_user")
-        .where({ user_email: email})
+        .where({ user_email: email })
         .first();
     if (user) {
-      const isPasswordValid = await bcrypt.compare(password, user.user_password);
+      const isPasswordValid = await bcrypt.compare(
+          password,
+          user.user_password,
+      );
       if (isPasswordValid) {
         await db
             .from("tbl_user")
             .where({ user_id: user.user_id })
             .update({ user_token: user_token });
-        res.status(200).json({
+        return res.status(200).json({
           error: false,
           message: "Login successful",
           data: {
@@ -101,19 +107,19 @@ const logInUserController = async (req, res) => {
           },
         });
       } else {
-        res.status(401).json({
+        return res.status(401).json({
           error: true,
           message: "Login failed Invalid credentials",
         });
       }
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Login failed Invalid credentials",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -172,18 +178,18 @@ const signInUserController = async (req, res) => {
     };
     const user = await db("tbl_user").insert(data);
     if (user) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Register user successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Register user failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -192,6 +198,7 @@ const signInUserController = async (req, res) => {
 };
 const updateUserController = async (req, res) => {
   const { id } = req.params;
+  const { token } = req.headers;
   const { name, email, phone, longitude, latitude } = req.body;
   if (!id) {
     return res.status(400).json({
@@ -199,47 +206,44 @@ const updateUserController = async (req, res) => {
       message: "Id user is required",
     });
   }
-  if (!name) {
+  if (!token) {
     return res.status(400).json({
       error: true,
-      message: "Name user is required",
-    });
-  }
-  if (!email) {
-    return res.status(400).json({
-      error: true,
-      message: "Email user is required",
-    });
-  }
-  if (!phone) {
-    return res.status(400).json({
-      error: true,
-      message: "Number phone user is required",
+      message: "Token user is required",
     });
   }
   try {
-    const updateData = {
-      user_name: name,
-      user_email: email,
-      user_phone: phone,
-      user_longitude: longitude,
-      user_latitude: latitude,
-      updated_at: db.fn.now(),
-    };
-    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
-    if (user) {
-      res.status(200).json({
-        error: false,
-        message: "Update user successful",
-      });
-    } else {
-      res.status(401).json({
-        error: true,
-        message: "Update user failed",
-      });
+    const isTokenValid = await db
+        .select("user_token")
+        .from("tbl_user")
+        .where({ user_id: id })
+        .first();
+    if (isTokenValid && isTokenValid.user_token === token) {
+      const updateData = {
+        user_name: name,
+        user_email: email,
+        user_phone: phone,
+        user_longitude: longitude,
+        user_latitude: latitude,
+        updated_at: db.fn.now(),
+      };
+      const user = await db("tbl_user")
+          .where({ user_id: id })
+          .update(updateData);
+      if (user) {
+        return res.status(200).json({
+          error: false,
+          message: "Update user successful",
+        });
+      } else {
+        return res.status(401).json({
+          error: true,
+          message: "Update user failed",
+        });
+      }
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -248,38 +252,35 @@ const updateUserController = async (req, res) => {
 };
 const updateUserProfileController = async (req, res) => {
   const { id } = req.params;
-  const { profile } = req.body;
+  let imageUrl = "";
+  if (req.file && req.file.cloudStoragePublicUrl) {
+    imageUrl = req.file.cloudStoragePublicUrl;
+  }
   if (!id) {
     return res.status(400).json({
       error: true,
       message: "Id user is required",
     });
   }
-  if (!profile) {
-    return res.status(400).json({
-      error: true,
-      message: "Profile user is required",
-    });
-  }
   try {
     const updateData = {
-      user_profile: profile,
+      user_profile: imageUrl,
       updated_at: db.fn.now(),
     };
     const user = await db("tbl_user").where({ user_id: id }).update(updateData);
     if (user) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Update user profile successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Update user profile failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -303,7 +304,7 @@ const updateUserPointController = async (req, res) => {
   }
   try {
     const updateData = {
-      user_profile: profile,
+      user_point: point,
       updated_at: db.fn.now(),
     };
     const user = await db("tbl_user").where({ user_id: id }).update(updateData);
@@ -368,17 +369,16 @@ const updateUserPasswordController = async (req, res) => {
     });
   }
 };
-/*
 const updateUserSubscriptionController = async (req, res) => {
   const { id } = req.params;
-  const { Subscription } = req.body;
+  const { subscription } = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
       message: "Id user is required",
     });
   }
-  if (!roles) {
+  if (!subscription) {
     return res.status(400).json({
       error: true,
       message: "Subscription user is required",
@@ -386,19 +386,19 @@ const updateUserSubscriptionController = async (req, res) => {
   }
   try {
     const updateData = {
-      user_roles: Subscription,
+      subscription_id: Subscription,
       updated_at: db.fn.now(),
     };
     const user = await db("tbl_user").where({ user_id: id }).update(updateData);
     if (user) {
       res.status(200).json({
         error: false,
-        message: "Update user roles successful",
+        message: "Update user subscription successful",
       });
     } else {
       res.status(401).json({
         error: true,
-        message: "Update user roles failed",
+        message: "Update user subscription failed",
       });
     }
   } catch (error) {
@@ -409,7 +409,6 @@ const updateUserSubscriptionController = async (req, res) => {
     });
   }
 };
-*/
 const deleteUserController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -421,18 +420,18 @@ const deleteUserController = async (req, res) => {
   try {
     const user = await db("tbl_user").where({ user_id: id }).delete();
     if (user) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Delete user successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Delete user failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -448,6 +447,6 @@ module.exports = {
   updateUserProfileController,
   updateUserPointController,
   updateUserPasswordController,
-  // updateUserSubscriptionController,
+  updateUserSubscriptionController,
   deleteUserController,
 };

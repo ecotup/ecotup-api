@@ -1,23 +1,26 @@
 const knex = require("knex");
-const knexfile = require("../../knexfile");
+const knexfile = require("../knexfile");
 const db = knex(knexfile.development);
 
 const getUserSubscriptionController = async (req, res) => {
   try {
     const subscription = await db.select().from("tbl_subscription");
-    res.status(200).json({
-      error: false,
-      message: "Request successful",
-      data: subscription,
-    });
+    if (subscription) {
+      return res.status(200).json({
+        error: false,
+        message: "Request successful",
+        data: subscription,
+      });
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "Request not found",
+      });
+    }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
-    });
-    res.status(404).json({
-      error: true,
-      message: "Request not found",
     });
   }
 };
@@ -36,24 +39,24 @@ const getSubscriptionByIdController = async (req, res) => {
         .where({ subscription_id: id })
         .first();
     if (subscription) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Request successful",
         data: subscription,
       });
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         error: true,
         message: "Request not found",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
     });
-  };
+  }
 };
 const insertSubscriptionController = async (req, res) => {
   const { status, value } = req.body;
@@ -77,18 +80,18 @@ const insertSubscriptionController = async (req, res) => {
     };
     const subscription = await db("tbl_subscription").insert(data);
     if (subscription) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Register subscription successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Register subscription failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -104,18 +107,6 @@ const updateSubscriptionController = async (req, res) => {
       message: "Id subscription is required",
     });
   }
-  if (!status) {
-    return res.status(400).json({
-      error: true,
-      message: "Status subscription is required",
-    });
-  }
-  if (!value) {
-    return res.status(400).json({
-      error: true,
-      message: "Value subscription is required",
-    });
-  }
   try {
     const updateData = {
       subscription_status: status,
@@ -126,18 +117,18 @@ const updateSubscriptionController = async (req, res) => {
         .where({ subscription_id: id })
         .update(updateData);
     if (subscription) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Update subscription successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Update subscription failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -157,18 +148,18 @@ const deleteSubscriptionController = async (req, res) => {
         .where({ subscription_id: id })
         .delete();
     if (subscription) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Delete subscription successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Delete subscription failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,

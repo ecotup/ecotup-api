@@ -13,6 +13,7 @@ exports.up = function(knex) {
         table.double("transaction_total_payment").notNullable();
         table.double("transaction_total_weight").notNullable();
         table.integer("transaction_total_point");
+        table.string("transaction_status").defaultTo("On Going");
         table.timestamp("created_at").defaultTo(knex.fn.now());
         table.timestamp("updated_at").defaultTo(knex.fn.now());
       });

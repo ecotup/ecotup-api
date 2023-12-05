@@ -1,23 +1,26 @@
 const knex = require("knex");
-const knexfile = require("../../knexfile");
+const knexfile = require("../knexfile");
 const db = knex(knexfile.development);
 
 const getAllRewardController = async (req, res) => {
   try {
     const rewards = await db.select().from("tbl_reward");
-    res.status(200).json({
-      error: false,
-      message: "Request successful",
-      data: rewards,
-    });
+    if (rewards) {
+      return res.status(200).json({
+        error: false,
+        message: "Request successful",
+        data: rewards,
+      });
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "Request not found",
+      });
+    }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
-    });
-    res.status(404).json({
-      error: true,
-      message: "Request not found",
     });
   }
 };
@@ -36,19 +39,19 @@ const getRewardByIdController = async (req, res) => {
         .where({ reward_id: id })
         .first();
     if (reward) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Request successful",
         data: reward,
       });
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         error: true,
         message: "Request not found",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -91,18 +94,18 @@ const insertRewardController = async (req, res) => {
     };
     const reward = await db("tbl_reward").insert(data);
     if (reward) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Register reward successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Register reward failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -111,35 +114,11 @@ const insertRewardController = async (req, res) => {
 };
 const updateRewardController = async (req, res) => {
   const { id } = req.params;
-  const { name, image, price, description} = req.body;
+  const { name, image, price, description } = req.body;
   if (!id) {
     return res.status(400).json({
       error: true,
       message: "Id reward is required",
-    });
-  }
-  if (!name) {
-    return res.status(400).json({
-      error: true,
-      message: "Name reward is required",
-    });
-  }
-  if (!image) {
-    return res.status(400).json({
-      error: true,
-      message: "Image reward is required",
-    });
-  }
-  if (!price) {
-    return res.status(400).json({
-      error: true,
-      message: "Price reward is required",
-    });
-  }
-  if (!description) {
-    return res.status(400).json({
-      error: true,
-      message: "Description reward is required",
     });
   }
   try {
@@ -154,18 +133,18 @@ const updateRewardController = async (req, res) => {
         .where({ reward_id: id })
         .update(updateData);
     if (reward) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Update reward successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Update reward failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -183,18 +162,18 @@ const deleteRewardController = async (req, res) => {
   try {
     const reward = await db("tbl_reward").where({ reward_id: id }).delete();
     if (reward) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Delete reward successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Delete reward failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,

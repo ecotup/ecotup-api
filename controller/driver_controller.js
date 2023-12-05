@@ -1,25 +1,28 @@
 const { v4: uuidv4 } = require("uuid");
 const knex = require("knex");
 const bcrypt = require("bcrypt");
-const knexfile = require("../../knexfile");
+const knexfile = require("../knexfile");
 const db = knex(knexfile.development);
 
 const getAllDriverController = async (req, res) => {
   try {
     const drivers = await db.select().from("tbl_driver");
-    res.status(200).json({
-      error: false,
-      message: "Request successful",
-      data: drivers,
-    });
+    if (drivers) {
+      return res.status(200).json({
+        error: false,
+        message: "Request successful",
+        data: drivers,
+      });
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "Request not found",
+      });
+    }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
-    });
-    res.status(404).json({
-      error: true,
-      message: "Request not found",
     });
   }
 };
@@ -45,19 +48,19 @@ const getDriverByIdController = async (req, res) => {
         .where({ driver_id: id })
         .first();
     if (driver) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Request successful",
         data: driver,
       });
     } else {
-      res.status(404).json({
+      return res.status(404).json({
         error: true,
         message: "Request not found",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -95,7 +98,7 @@ const logInDriverController = async (req, res) => {
             .from("tbl_driver")
             .where({ driver_id: driver.driver_id })
             .update({ driver_token: driver_token });
-        res.status(200).json({
+        return res.status(200).json({
           error: false,
           message: "Login successful",
           data: {
@@ -104,19 +107,19 @@ const logInDriverController = async (req, res) => {
           },
         });
       } else {
-        res.status(401).json({
+        return res.status(401).json({
           error: true,
           message: "Login failed Invalid credentials",
         });
       }
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Login failed Invalid credentials",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -124,7 +127,8 @@ const logInDriverController = async (req, res) => {
   }
 };
 const signInDriverController = async (req, res) => {
-  const { name, password, email, phone, longitude, latitude, type, license} = req.body;
+  const { name, password, email, phone, longitude, latitude, type, license } =
+    req.body;
   const saltRounds = 10;
   if (!name) {
     return res.status(400).json({
@@ -189,18 +193,18 @@ const signInDriverController = async (req, res) => {
     };
     const driver = await db("tbl_driver").insert(data);
     if (driver) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Register driver successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Register driver failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -216,36 +220,6 @@ const updateDriverController = async (req, res) => {
       message: "Id driver is required",
     });
   }
-  if (!name) {
-    return res.status(400).json({
-      error: true,
-      message: "Name driver is required",
-    });
-  }
-  if (!email) {
-    return res.status(400).json({
-      error: true,
-      message: "Email driver is required",
-    });
-  }
-  if (!phone) {
-    return res.status(400).json({
-      error: true,
-      message: "Number phone driver is required",
-    });
-  }
-  if (!type) {
-    return res.status(400).json({
-      error: true,
-      message: "Type driver is required",
-    });
-  }
-  if (!license) {
-    return res.status(400).json({
-      error: true,
-      message: "License driver is required",
-    });
-  }
   try {
     const updateData = {
       driver_name: name,
@@ -257,20 +231,22 @@ const updateDriverController = async (req, res) => {
       driver_license: license,
       updated_at: db.fn.now(),
     };
-    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    const driver = await db("tbl_driver")
+        .where({ driver_id: id })
+        .update(updateData);
     if (driver) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Update driver successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Update driver failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -279,38 +255,37 @@ const updateDriverController = async (req, res) => {
 };
 const updatedriverProfileController = async (req, res) => {
   const { id } = req.params;
-  const { profile } = req.body;
+  let imageUrl = "";
+  if (req.file && req.file.cloudStoragePublicUrl) {
+    imageUrl = req.file.cloudStoragePublicUrl;
+  }
   if (!id) {
     return res.status(400).json({
       error: true,
       message: "Id driver is required",
     });
   }
-  if (!profile) {
-    return res.status(400).json({
-      error: true,
-      message: "Profile driver is required",
-    });
-  }
   try {
     const updateData = {
-      driver_profile: profile,
+      driver_profile: imageUrl,
       updated_at: db.fn.now(),
     };
-    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    const driver = await db("tbl_driver")
+        .where({ driver_id: id })
+        .update(updateData);
     if (driver) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Update driver profile successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Update driver profile failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -334,23 +309,67 @@ const updatedriverPointController = async (req, res) => {
   }
   try {
     const updateData = {
-      driver_profile: profile,
+      driver_point: point,
       updated_at: db.fn.now(),
     };
-    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    const driver = await db("tbl_driver")
+        .where({ driver_id: id })
+        .update(updateData);
     if (driver) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Update driver point successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Update driver point failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
+      error: true,
+      message: "Internal server error",
+      debug: error.message,
+    });
+  }
+};
+const updatedriverRatingController = async (req, res) => {
+  const { id } = req.params;
+  const { rating } = req.body;
+  if (!id) {
+    return res.status(400).json({
+      error: true,
+      message: "Id driver is required",
+    });
+  }
+  if (!rating) {
+    return res.status(400).json({
+      error: true,
+      message: "Rating driver is required",
+    });
+  }
+  try {
+    const updateData = {
+      driver_rating: point,
+      updated_at: db.fn.now(),
+    };
+    const driver = await db("tbl_driver")
+        .where({ driver_id: id })
+        .update(updateData);
+    if (driver) {
+      return res.status(200).json({
+        error: false,
+        message: "Update driver rating successful",
+      });
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: "Update driver rating failed",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -379,20 +398,22 @@ const updateDriverPasswordController = async (req, res) => {
       driver_password: hashPassword,
       updated_at: db.fn.now(),
     };
-    const driver = await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    const driver = await db("tbl_driver")
+        .where({ driver_id: id })
+        .update(updateData);
     if (driver) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Update driver password successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Update driver password failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -410,18 +431,18 @@ const deleteDriverController = async (req, res) => {
   try {
     const driver = await db("tbl_driver").where({ driver_id: id }).delete();
     if (driver) {
-      res.status(200).json({
+      return res.status(200).json({
         error: false,
         message: "Delete driver successful",
       });
     } else {
-      res.status(401).json({
+      return res.status(401).json({
         error: true,
         message: "Delete driver failed",
       });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       message: "Internal server error",
       debug: error.message,
@@ -436,6 +457,7 @@ module.exports = {
   updateDriverController,
   updatedriverProfileController,
   updatedriverPointController,
+  updatedriverRatingController,
   updateDriverPasswordController,
   deleteDriverController,
 };
