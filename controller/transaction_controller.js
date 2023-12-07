@@ -72,7 +72,7 @@ const getTransactionByIdController = async (req, res) => {
       });
     }
   }
-  if (id_user) {
+  if (user_id) {
     try {
       const transaction = await db
           .select(
@@ -114,58 +114,83 @@ const getTransactionByIdController = async (req, res) => {
 };
 const insertTransactionController = async (req, res) => {
   const {
+    driver_id,
+    user_id,
     longitude_start,
     latitude_start,
     longitude_destination,
     latitude_destination,
+    description,
     total_payment,
     total_weight,
     total_point,
+    status,
   } = req.body;
+  if (!driver_id) {
+    return res.status(400).json({
+      error: true,
+      message: "Id driver is required",
+    });
+  }
+  if (!user_id) {
+    return res.status(400).json({
+      error: true,
+      message: "Id user is required",
+    });
+  }
   if (!longitude_start) {
     return res.status(400).json({
       error: true,
-      message: "longitude start transaction is required",
+      message: "Longitude start transaction is required",
     });
   }
   if (!latitude_start) {
     return res.status(400).json({
       error: true,
-      message: "latitude start transaction is required",
+      message: "Latitude start transaction is required",
     });
   }
   if (!longitude_destination) {
     return res.status(400).json({
       error: true,
-      message: "longitude destination transaction is required",
+      message: "Longitude destination transaction is required",
     });
   }
   if (!latitude_destination) {
     return res.status(400).json({
       error: true,
-      message: "latitude destination transaction is required",
+      message: "Latitude destination transaction is required",
     });
   }
   if (!total_payment) {
     return res.status(400).json({
       error: true,
-      message: "total payment transaction is required",
+      message: "Total payment transaction is required",
     });
   }
   if (!total_weight) {
     return res.status(400).json({
       error: true,
-      message: "total weight transaction is required",
+      message: "Total weight transaction is required",
     });
   }
   if (!total_point) {
     return res.status(400).json({
       error: true,
-      message: "total point transaction is required",
+      message: "Total point transaction is required",
+    });
+  }
+  if (!status) {
+    return res.status(400).json({
+      error: true,
+      message: "Status transaction is required",
     });
   }
   try {
     const data = {
+      user_id: user_id,
+      driver_id: driver_id,
+      transaction_description: description,
       transaction_longitude_start: longitude_start,
       transaction_latitude_start: latitude_start,
       transaction_longitude_destination: longitude_destination,
@@ -239,6 +264,44 @@ const updateTransactionController = async (req, res) => {
     });
   }
 };
+const updateTransactionStatusController = async (req, res) => {
+  const { id } = req.params;
+  const {
+    status,
+  } = req.body;
+  if (!status) {
+    return res.status(400).json({
+      error: true,
+      message: "Status transaction is required",
+    });
+  }
+  try {
+    const updateData = {
+      transaction_status: status,
+      updated_at: db.fn.now(),
+    };
+    const transaction = await db("tbl_transaction")
+        .where({ transaction_id: id })
+        .update(updateData);
+    if (transaction) {
+      return res.status(200).json({
+        error: false,
+        message: "Update transaction successful",
+      });
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: "Update transaction failed",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal server error",
+      debug: error.message,
+    });
+  }
+};
 const deleteTransactionController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -275,5 +338,6 @@ module.exports = {
   getTransactionByIdController,
   insertTransactionController,
   updateTransactionController,
+  updateTransactionStatusController,
   deleteTransactionController,
 };

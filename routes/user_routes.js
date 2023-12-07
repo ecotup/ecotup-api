@@ -12,7 +12,6 @@ const {
   logInUserController,
   signInUserController,
   updateUserController,
-  updateUserProfileController,
   updateUserPointController,
   updateUserPasswordController,
   updateUserSubscriptionController,
@@ -24,7 +23,6 @@ router.get("/detail/:id", getUserByIdController);
 router.post("/login", logInUserController);
 router.post("/register", signInUserController);
 router.put("/update/:id", updateUserController);
-router.post("/update/profile/:id", multer.single('attachment'), ImageUpload.uploadToGcs, updateUserProfileController);
 router.post("/update/point/:id", updateUserPointController);
 router.post("/update/password/:id", updateUserPasswordController);
 router.post("/update/subscription/:id", updateUserSubscriptionController);
