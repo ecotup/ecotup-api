@@ -12,9 +12,8 @@ const {
   logInDriverController,
   signInDriverController,
   updateDriverController,
-  updatedriverProfileController,
-  updatedriverPointController,
-  updatedriverRatingController,
+  updateDriverPointController,
+  updateDriverRatingController,
   updateDriverPasswordController,
   deleteDriverController,
 } = require("../controller/driver_controller");
@@ -24,9 +23,9 @@ router.get("/detail/:id", getDriverByIdController);
 router.post("/login", logInDriverController);
 router.post("/register", signInDriverController);
 router.put("/update/:id", updateDriverController);
-router.post("/update/profile/:id", multer.single("attachment"), ImageUpload.uploadToGcs, updatedriverProfileController);
-router.post("/update/point/:id", updatedriverPointController);
-router.post("/update/rating/:id", updatedriverRatingController);
+router.post("/update/profile/:id", updateDriverProfileController);
+router.post("/update/point/:id", updateDriverPointController);
+router.post("/update/rating/:id", updateDriverRatingController);
 router.post("/update/password/:id", updateDriverPasswordController);
 router.delete("/delete/:id", deleteDriverController);
 

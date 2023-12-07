@@ -43,10 +43,8 @@ const getUserByIdController = async (req, res) => {
   }
   try {
     const user = await db
-        .select()
-        .from("tbl_user")
-        .where({ user_id: id })
-        .first();
+        .raw("SELECT tbl_user.*,tbl_subscription.subscription_id, tbl_subscription.subscription_status, tbl_subscription.subscription_value FROM tbl_user INNER JOIN tbl_subscription ON tbl_user.subscription_id = tbl_subscription.subscription_id")
+        .where({ user_id: id });
     if (user) {
       return res.status(200).json({
         error: false,
@@ -250,43 +248,6 @@ const updateUserController = async (req, res) => {
     });
   }
 };
-const updateUserProfileController = async (req, res) => {
-  const { id } = req.params;
-  let imageUrl = "";
-  if (req.file && req.file.cloudStoragePublicUrl) {
-    imageUrl = req.file.cloudStoragePublicUrl;
-  }
-  if (!id) {
-    return res.status(400).json({
-      error: true,
-      message: "Id user is required",
-    });
-  }
-  try {
-    const updateData = {
-      user_profile: imageUrl,
-      updated_at: db.fn.now(),
-    };
-    const user = await db("tbl_user").where({ user_id: id }).update(updateData);
-    if (user) {
-      return res.status(200).json({
-        error: false,
-        message: "Update user profile successful",
-      });
-    } else {
-      return res.status(401).json({
-        error: true,
-        message: "Update user profile failed",
-      });
-    }
-  } catch (error) {
-    return res.status(500).json({
-      error: true,
-      message: "Internal server error",
-      debug: error.message,
-    });
-  }
-};
 const updateUserPointController = async (req, res) => {
   const { id } = req.params;
   const { point } = req.body;
@@ -300,6 +261,12 @@ const updateUserPointController = async (req, res) => {
     return res.status(400).json({
       error: true,
       message: "Point user is required",
+    });
+  }
+  if (!token) {
+    return res.status(400).json({
+      error: true,
+      message: "Token user is required",
     });
   }
   try {
@@ -444,7 +411,6 @@ module.exports = {
   getAllUserController,
   getUserByIdController,
   updateUserController,
-  updateUserProfileController,
   updateUserPointController,
   updateUserPasswordController,
   updateUserSubscriptionController,
