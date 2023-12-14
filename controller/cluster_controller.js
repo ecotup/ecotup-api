@@ -26,12 +26,6 @@ const getAllClusterController = async (req, res) => {
 };
 const getClusterByIdController = async (req, res) => {
   const { user_id, driver_id } = req.body;
-  if (!user_id || !driver_id) {
-    return res.status(400).json({
-      error: true,
-      message: "Id user or driver is required",
-    });
-  }
   if (driver_id) {
     try {
       const cluster = await db
@@ -97,6 +91,11 @@ const getClusterByIdController = async (req, res) => {
         debug: error.message,
       });
     }
+  } else {
+    return res.status(404).json({
+      error: true,
+      message: "Request not found",
+    });
   }
 };
 const insertClusterController = async (req, res) => {

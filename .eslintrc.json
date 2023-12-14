@@ -18,6 +18,7 @@
     "new-cap": "off",
     "camelcase":"off",
     "prefer-const":"off",
+    "prefer-promise-reject-errors":"off",
     "require-jsdoc":"off"
   }
 }

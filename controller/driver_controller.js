@@ -2,8 +2,8 @@ const { v4: uuidv4 } = require("uuid");
 const knex = require("knex");
 const bcrypt = require("bcrypt");
 const knexfile = require("../knexfile");
+const { uploadFileToStorage } = require("../modules/multer_modules");
 const db = knex(knexfile.development);
-
 const getAllDriverController = async (req, res) => {
   try {
     const drivers = await db.select().from("tbl_driver");
@@ -126,6 +126,50 @@ const logInDriverController = async (req, res) => {
     });
   }
 };
+const logInWithGoogleDriverController = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({
+      error: true,
+      message: "Email user is required",
+    });
+  }
+  try {
+    const driver_token = uuidv4();
+    const driver = await db
+        .select()
+        .from("tbl_driver")
+        .where({ driver_email: email })
+        .first();
+    if (driver) {
+      const response = await db
+          .from("tbl_driver")
+          .where({ driver_id: driver.driver_id })
+          .update({ driver_token: driver_token });
+      if (response) {
+        return res.status(200).json({
+          error: false,
+          message: "Request successful",
+          data: {
+            user_id: driver.driver_id,
+            user_token: driver_token,
+          },
+        });
+      }
+    } else {
+      return res.status(404).json({
+        error: true,
+        message: "Request not found",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal server error",
+      debug: error.message,
+    });
+  }
+};
 const signInDriverController = async (req, res) => {
   const { name, password, email, phone, longitude, latitude, type, license } =
     req.body;
@@ -187,6 +231,68 @@ const signInDriverController = async (req, res) => {
       driver_phone: phone,
       driver_longitude: longitude,
       driver_latitude: latitude,
+      driver_type: type,
+      driver_license: license,
+      created_at: db.fn.now(),
+    };
+    const driver = await db("tbl_driver").insert(data);
+    if (driver) {
+      return res.status(200).json({
+        error: false,
+        message: "Register driver successful",
+      });
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: "Register driver failed",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      error: true,
+      message: "Internal server error",
+      debug: error.message,
+    });
+  }
+};
+const signInWithGoogleDriverController = async (req, res) => {
+  const { name, email, phone, type, license } =
+    req.body;
+  if (!name) {
+    return res.status(400).json({
+      error: true,
+      message: "Name driver is required",
+    });
+  }
+  if (!email) {
+    return res.status(400).json({
+      error: true,
+      message: "Email driver is required",
+    });
+  }
+  if (!phone) {
+    return res.status(400).json({
+      error: true,
+      message: "Phone driver is required",
+    });
+  }
+  if (!type) {
+    return res.status(400).json({
+      error: true,
+      message: "Type driver is required",
+    });
+  }
+  if (!license) {
+    return res.status(400).json({
+      error: true,
+      message: "License driver is required",
+    });
+  }
+  try {
+    const data = {
+      driver_name: name,
+      driver_email: email,
+      driver_phone: phone,
       driver_type: type,
       driver_license: license,
       created_at: db.fn.now(),
@@ -395,6 +501,44 @@ const updateDriverPasswordController = async (req, res) => {
     });
   }
 };
+const uploadDriverController = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({
+      error: true,
+      message: "Id driver is required",
+    });
+  }
+  if (!req.file) {
+    return res.status(400).json({
+      error: true,
+      message: "Profile driver is required",
+    });
+  }
+  try {
+    await uploadFileToStorage(req.file, "Driver");
+    const url =
+      "https://storage.googleapis.com/ecotup-development-bucket/Driver/" +
+      req.file.originalname;
+    const updateData = {
+      driver_profile: url,
+      updated_at: db.fn.now(),
+    };
+    await db("tbl_driver").where({ driver_id: id }).update(updateData);
+    res.status(200).json({
+      error: false,
+      message: "Upload driver profile successful",
+      driver_profile: url,
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: true,
+      message: "Upload driver profile failed",
+      debug: error.message,
+    });
+  }
+};
+
 const deleteDriverController = async (req, res) => {
   const { id } = req.params;
   if (!id) {
@@ -426,12 +570,15 @@ const deleteDriverController = async (req, res) => {
 };
 module.exports = {
   signInDriverController,
+  signInWithGoogleDriverController,
   logInDriverController,
+  logInWithGoogleDriverController,
   getAllDriverController,
   getDriverByIdController,
   updateDriverController,
   updateDriverPointController,
   updateDriverRatingController,
   updateDriverPasswordController,
+  uploadDriverController,
   deleteDriverController,
 };

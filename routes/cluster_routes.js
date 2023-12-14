@@ -10,7 +10,7 @@ const {
 } = require("../controller/cluster_controller");
 
 router.get("/", getAllClusterController);
-router.get("/detail/:id", getClusterByIdController);
+router.get("/detail", getClusterByIdController);
 router.post("/register", insertClusterController);
 router.put("/update/:id", updateClusterController);
 router.delete("/delete/:id", deleteClusterController);

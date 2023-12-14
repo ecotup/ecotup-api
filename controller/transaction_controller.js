@@ -27,12 +27,6 @@ const getAllTransactionController = async (req, res) => {
 
 const getTransactionByIdController = async (req, res) => {
   const { user_id, driver_id } = req.body;
-  if (!user_id || !driver_id) {
-    return res.status(400).json({
-      error: true,
-      message: "Id user or driver is required",
-    });
-  }
   if (driver_id) {
     try {
       const transaction = await db
@@ -194,10 +188,11 @@ const insertTransactionController = async (req, res) => {
       transaction_longitude_start: longitude_start,
       transaction_latitude_start: latitude_start,
       transaction_longitude_destination: longitude_destination,
-      transaction_latitude_destinantion: latitude_destination,
+      transaction_latitude_destination: latitude_destination,
       transaction_total_payment: total_payment,
       transaction_total_weight: total_weight,
       transaction_total_point: total_point,
+      transaction_status: status,
       created_at: db.fn.now(),
     };
     const transaction = await db("tbl_transaction").insert(data);
@@ -230,6 +225,7 @@ const updateTransactionController = async (req, res) => {
     total_payment,
     total_weight,
     total_point,
+    description,
   } = req.body;
   try {
     const updateData = {
@@ -240,6 +236,7 @@ const updateTransactionController = async (req, res) => {
       transaction_total_payment: total_payment,
       transaction_total_weight: total_weight,
       transaction_total_point: total_point,
+      transaction_description: description,
       updated_at: db.fn.now(),
     };
     const transaction = await db("tbl_transaction")

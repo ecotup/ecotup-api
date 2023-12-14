@@ -11,7 +11,7 @@ const {
 } = require("../controller/transaction_controller");
 
 router.get("/", getAllTransactionController);
-router.get("/detail/:id", getTransactionByIdController);
+router.get("/detail", getTransactionByIdController);
 router.post("/register", insertTransactionController);
 router.put("/update/:id", updateTransactionController);
 router.post("/update/status/:id", updateTransactionStatusController);
