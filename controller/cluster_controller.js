@@ -1,5 +1,6 @@
 const knex = require("knex");
 const knexfile = require("../knexfile");
+const axios = require("axios");
 const db = knex(knexfile.development);
 
 const getAllClusterController = async (req, res) => {
@@ -31,14 +32,14 @@ const getClusterByIdController = async (req, res) => {
       const cluster = await db
           .select(
               "driver_id",
+              "user_id",
               "cluster_id",
               "cluster_name",
               "cluster_region",
               "updated_at",
           )
           .from("tbl_cluster")
-          .where({ driver_id: driver_id })
-          .first();
+          .where({ driver_id: driver_id });
       if (cluster) {
         return res.status(200).json({
           error: false,
@@ -64,6 +65,7 @@ const getClusterByIdController = async (req, res) => {
       const cluster = await db
           .select(
               "user_id",
+              "driver_id",
               "cluster_id",
               "cluster_name",
               "cluster_region",

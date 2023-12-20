@@ -290,7 +290,6 @@ const signInWithGoogleUserController = async (req, res) => {
 };
 const updateUserController = async (req, res) => {
   const { id } = req.params;
-  const { token } = req.headers;
   const { name, email, phone, longitude, latitude } = req.body;
   if (!id) {
     return res.status(400).json({
@@ -298,41 +297,28 @@ const updateUserController = async (req, res) => {
       message: "Id user is required",
     });
   }
-  if (!token) {
-    return res.status(400).json({
-      error: true,
-      message: "Token user is required",
-    });
-  }
   try {
-    const isTokenValid = await db
-        .select("user_token")
-        .from("tbl_user")
+    const updateData = {
+      user_name: name,
+      user_email: email,
+      user_phone: phone,
+      user_longitude: longitude,
+      user_latitude: latitude,
+      updated_at: db.fn.now(),
+    };
+    const user = await db("tbl_user")
         .where({ user_id: id })
-        .first();
-    if (isTokenValid && isTokenValid.user_token === token) {
-      const updateData = {
-        user_name: name,
-        user_email: email,
-        user_phone: phone,
-        user_longitude: longitude,
-        user_latitude: latitude,
-        updated_at: db.fn.now(),
-      };
-      const user = await db("tbl_user")
-          .where({ user_id: id })
-          .update(updateData);
-      if (user) {
-        return res.status(200).json({
-          error: false,
-          message: "Update user successful",
-        });
-      } else {
-        return res.status(401).json({
-          error: true,
-          message: "Update user failed",
-        });
-      }
+        .update(updateData);
+    if (user) {
+      return res.status(200).json({
+        error: false,
+        message: "Update user successful",
+      });
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: "Update user failed",
+      });
     }
   } catch (error) {
     return res.status(500).json({

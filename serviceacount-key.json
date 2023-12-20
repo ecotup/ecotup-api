@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "ecotup-production",
+  "private_key_id": "6fcc2ee7c6d16b3102b1355d4ba540f0a31042f2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCqyDw1ojE7POje\nIGjF/NCJv3UJApAvsSO2Ypg49SEXrT9CbF0BsIYq0mI2eFxpRPzfK6tUiZ+9uj3p\njD3AI97Y9GbSTKz/V2bSscw9ANmhpa1zxntKNswqnnCZMovGlnxGSsd/bMBYNUoq\nfoCMOIkusKPKMtKIQmzYT4klf/FZqgb6stC+/dTecKwOwkzLMWMBnHPKr1h0MXBh\nwuQTTOjfCkOAbLe/7s+lJCg5Y2iFcsOt4KtydlBVTypQwexrMJNx0hzFXdK2sOsY\nCDQ++bHi/zX/uT9SFslEu4DHLs4jo25Xt5ApT5YKsW1aAlmaN8+d7fwXAWrbl3+8\nAqzsD2FtAgMBAAECggEAC3CaR+Vzcspjtu1o10pWFcQTbOUVD3zILaFxHO+epd1f\nDW4A1OokMp4hIhDx78NFRRXBxknpv2XIW+qfAE3m0ZWdhZzJQdly884hJjz2VxOo\nCMdU3uXIy1oNpNVz83uFG5hKwMhiIgZ/z1Tl+36WAeCnOBYrcCEy9VJul2p4mk7j\nVXDY49njEh7ZFa9c6uWEv1Hf5BsPsExcvgpv/cpheKM+PDB2Ysbu94Z/LwBfmCIT\n93eo9F325sAqarimI9P6meqkhWUh3g/kNW/2oeUEIPYs+3WdlJqvgEHZa1J930xT\nUD0F+YJ5NR5nJaWRQrQ+mVO79uwYLZmufDihkuhTwQKBgQDdl8ELk2NgRpENEjBp\nLtaDOpRWQ6OtNoCi0GFVz6APXiOctRASRgdnQ+yCEE8Avk/iXfl/eC3YjJXPQxqG\nY0/rtMlR3QqY9d9pn3MXHmz2DgNIiFpEBgmn7VvAhp3n/phAK3LVudI8BSIBV4RJ\nbMKZXxeetDA4jBVLUcGYQMSH6QKBgQDFTMY/lvkarA4V6rMX2GSxE7yz3PIFyD4Y\npz0Mj1h0GAKXbrfRBeXoD7mmErZ8Cq7yBDuWG7OxPYYWbIcKzJ+NJzXnA0la7Dfj\n1AJkC7GWR2EMRw1H6MjldK+LPAXO1MqmJqaRPAe/gzEroLdGZOKmd525fAFqqPiT\n8IueUWCe5QKBgE8vGlnDmmBd9xlfpZMAnMEaHsXQt91+u2ry4cVjQ0QalMk73nlZ\nMu4Q1KQJpeGTIEK46B5H2MIoQqRky0a4mGeXG9W4EkBkpCg/RUY+phsrGLtDllX2\nfl7Wr9HViPnM/aT4obmEBH9UKjmmh2whhEyAMZWRuCWM0VMv7Ok2Q8R5AoGAOu5G\nnMHEX/IaNvOmUK4CzV1e1L5ez9lSqtxxAKpkOjDdvUuFvfosBJeF1RPry7sJLCKV\nha16i6sbvODnqRMbaPbYQ8sYgv7hZrxxhl5zybZCR3+FeQAP2XFz6XuhJHksmlob\nEHBExDA0ZJqZg34osJ4zzy454hjcPpvvp/cYi/0CgYAfedQ82o08IrwNI3RyPBuD\n6yFu61st8uj39k9tx7fDoHo4bHIb1yawmPelLWePXeWvj0A5LJ2wFmezQnsW9v2+\neCJ04bd6NfWGdNa95eoMqyr1WMV1FIg72JEj09v/bT4PjPAUHF/OaHcdRBk3fKLs\nT6H3NmfBCHzNVdRGZY7ctA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "ecotup-sa-production@ecotup-production.iam.gserviceaccount.com",
+  "client_id": "106308825170804750095",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ecotup-sa-production%40ecotup-production.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

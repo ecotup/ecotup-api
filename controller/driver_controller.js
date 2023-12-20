@@ -319,7 +319,6 @@ const signInWithGoogleDriverController = async (req, res) => {
 };
 const updateDriverController = async (req, res) => {
   const { id } = req.params;
-  const { token } = req.headers;
   const { name, email, phone, longitude, latitude, type, license } = req.body;
   if (!id) {
     return res.status(400).json({
@@ -327,43 +326,31 @@ const updateDriverController = async (req, res) => {
       message: "Id driver is required",
     });
   }
-  if (!token) {
-    return res.status(400).json({
-      error: true,
-      message: "Token driver is required",
-    });
-  }
-  const isTokenValid = await db
-      .select("driver_token")
-      .from("tbl_driver")
-      .where({ driver_id: id })
-      .first();
+
   try {
-    if (isTokenValid && isTokenValid.driver_token === token) {
-      const updateData = {
-        driver_name: name,
-        driver_email: email,
-        driver_phone: phone,
-        driver_longitude: longitude,
-        driver_latitude: latitude,
-        driver_type: type,
-        driver_license: license,
-        updated_at: db.fn.now(),
-      };
-      const driver = await db("tbl_driver")
-          .where({ driver_id: id })
-          .update(updateData);
-      if (driver) {
-        return res.status(200).json({
-          error: false,
-          message: "Update driver successful",
-        });
-      } else {
-        return res.status(401).json({
-          error: true,
-          message: "Update driver failed",
-        });
-      }
+    const updateData = {
+      driver_name: name,
+      driver_email: email,
+      driver_phone: phone,
+      driver_longitude: longitude,
+      driver_latitude: latitude,
+      driver_type: type,
+      driver_license: license,
+      updated_at: db.fn.now(),
+    };
+    const driver = await db("tbl_driver")
+        .where({ driver_id: id })
+        .update(updateData);
+    if (driver) {
+      return res.status(200).json({
+        error: false,
+        message: "Update driver successful",
+      });
+    } else {
+      return res.status(401).json({
+        error: true,
+        message: "Update driver failed",
+      });
     }
   } catch (error) {
     return res.status(500).json({
@@ -432,7 +419,7 @@ const updateDriverRatingController = async (req, res) => {
   }
   try {
     const updateData = {
-      driver_rating: point,
+      driver_rating: rating,
       updated_at: db.fn.now(),
     };
     const driver = await db("tbl_driver")

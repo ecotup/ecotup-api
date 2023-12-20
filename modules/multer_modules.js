@@ -1,5 +1,5 @@
 const { Storage } = require("@google-cloud/storage");
-const bucketName = "ecotup-development-bucket";
+const bucketName = "ecotup-production.appspot.com";
 const path = require("path");
 const keyFilePath = path.join("serviceaccount-key.json");
 

@@ -1,16 +1,17 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 4.7.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 05, 2023 at 04:53 PM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 8.2.0
+-- Host: 34.101.70.239
+-- Generation Time: Dec 16, 2023 at 08:11 AM
+-- Server version: 5.7.44-google-log
+-- PHP Version: 7.0.33-0ubuntu0.16.04.16
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
+SET time_zone = "+00:00";
 
-create database db_ecotup;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -34,9 +35,9 @@ CREATE TABLE `tbl_article` (
   `article_author` varchar(255) DEFAULT NULL,
   `article_link` varchar(255) DEFAULT NULL,
   `article_date` date DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -48,11 +49,11 @@ CREATE TABLE `tbl_cluster` (
   `cluster_id` int(11) UNSIGNED NOT NULL,
   `cluster_name` varchar(255) NOT NULL,
   `cluster_region` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `user_id` int(10) UNSIGNED DEFAULT NULL,
   `driver_id` int(10) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -63,22 +64,22 @@ CREATE TABLE `tbl_cluster` (
 CREATE TABLE `tbl_driver` (
   `driver_id` int(10) UNSIGNED NOT NULL,
   `driver_name` varchar(255) NOT NULL,
-  `driver_password` varchar(255) NOT NULL,
+  `driver_password` varchar(255) DEFAULT NULL,
   `driver_email` varchar(255) NOT NULL,
   `driver_phone` varchar(14) NOT NULL,
-  `driver_longitude` double NOT NULL,
-  `driver_latitude` double NOT NULL,
-  `driver_type` varchar(255) DEFAULT NULL,
-  `driver_license` varchar(255) DEFAULT NULL,
+  `driver_longitude` double DEFAULT NULL,
+  `driver_latitude` double DEFAULT NULL,
+  `driver_type` varchar(255) NOT NULL,
+  `driver_license` varchar(255) NOT NULL,
   `driver_profile` varchar(255) DEFAULT NULL,
-  `driver_point` int(11) DEFAULT 0,
+  `driver_point` int(11) DEFAULT '0',
   `driver_token` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `driver_rating` float DEFAULT 5,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `driver_rating` float DEFAULT '5',
   `transaction_id` int(10) UNSIGNED DEFAULT NULL,
   `cluster_id` int(10) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -92,9 +93,9 @@ CREATE TABLE `tbl_reward` (
   `reward_name` varchar(255) DEFAULT NULL,
   `reward_price` varchar(255) DEFAULT NULL,
   `reward_description` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -105,10 +106,10 @@ CREATE TABLE `tbl_reward` (
 CREATE TABLE `tbl_subscription` (
   `subscription_id` int(10) UNSIGNED NOT NULL,
   `subscription_status` varchar(255) DEFAULT NULL,
-  `subscription_value` int(11) DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `subscription_value` int(11) DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -127,11 +128,11 @@ CREATE TABLE `tbl_transaction` (
   `transaction_total_weight` double NOT NULL,
   `transaction_total_point` int(11) DEFAULT NULL,
   `transaction_status` varchar(25) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `user_id` int(10) UNSIGNED DEFAULT NULL,
   `driver_id` int(10) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -142,20 +143,21 @@ CREATE TABLE `tbl_transaction` (
 CREATE TABLE `tbl_user` (
   `user_id` int(10) UNSIGNED NOT NULL,
   `user_name` varchar(255) NOT NULL,
-  `user_password` varchar(255) NOT NULL,
+  `user_password` varchar(255) DEFAULT NULL,
   `user_email` varchar(255) NOT NULL,
   `user_phone` varchar(14) NOT NULL,
-  `user_longitude` double NOT NULL,
-  `user_latitude` double NOT NULL,
+  `user_longitude` double DEFAULT NULL,
+  `user_latitude` double DEFAULT NULL,
   `user_profile` varchar(255) DEFAULT NULL,
-  `user_point` int(11) DEFAULT 0,
+  `user_point` int(11) DEFAULT '0',
   `user_token` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `subscription_id` int(10) UNSIGNED DEFAULT NULL,
+  `user_subscription_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `subscription_id` int(10) UNSIGNED DEFAULT '5',
   `transaction_id` int(10) UNSIGNED DEFAULT NULL,
   `cluster_id` int(10) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for dumped tables
@@ -222,44 +224,37 @@ ALTER TABLE `tbl_user`
 -- AUTO_INCREMENT for table `tbl_article`
 --
 ALTER TABLE `tbl_article`
-  MODIFY `article_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
+  MODIFY `article_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `tbl_cluster`
 --
 ALTER TABLE `tbl_cluster`
-  MODIFY `cluster_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
-
+  MODIFY `cluster_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=420;
 --
 -- AUTO_INCREMENT for table `tbl_driver`
 --
 ALTER TABLE `tbl_driver`
-  MODIFY `driver_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
+  MODIFY `driver_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `tbl_reward`
 --
 ALTER TABLE `tbl_reward`
-  MODIFY `reward_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
+  MODIFY `reward_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `tbl_subscription`
 --
 ALTER TABLE `tbl_subscription`
-  MODIFY `subscription_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
+  MODIFY `subscription_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `tbl_transaction`
 --
 ALTER TABLE `tbl_transaction`
-  MODIFY `transaction_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
+  MODIFY `transaction_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `tbl_user`
 --
 ALTER TABLE `tbl_user`
-  MODIFY `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
-
+  MODIFY `user_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 --
 -- Constraints for dumped tables
 --
