@@ -23,5 +23,5 @@ app.use("/api/transaction", require("./routes/transaction_routes"));
 app.use("/api/cluster", require("./routes/cluster_routes"));
 
 app.listen(port, () => {
-  console.log("Server is up and listening on" + port);
+  console.log("Server is up and listening on http://127.0.0.1:" + port);
 });

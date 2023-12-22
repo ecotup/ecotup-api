@@ -505,7 +505,7 @@ const uploadDriverController = async (req, res) => {
   try {
     await uploadFileToStorage(req.file, "Driver");
     const url =
-      "https://storage.googleapis.com/ecotup-development-bucket/Driver/" +
+      "https://storage.googleapis.com/ecotup-production.appspot.com/Driver/" +
       req.file.originalname;
     const updateData = {
       driver_profile: url,

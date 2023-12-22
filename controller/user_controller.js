@@ -468,19 +468,21 @@ const uploadUserController = async (req, res) => {
   }
   try {
     await uploadFileToStorage(req.file, "User");
-    const url = "https://storage.googleapis.com/ecotup-development-bucket/User/"+ req.file.originalname;
+    const url =
+      "https://storage.googleapis.com/ecotup-production.appspot.com/User/" +
+      req.file.originalname;
     const updateData = {
       user_profile: url,
       updated_at: db.fn.now(),
     };
     await db("tbl_user").where({ user_id: id }).update(updateData);
-    res.status(200).json({
+    return res.status(200).json({
       error: false,
       message: "Upload user profile successful",
       user_profile: url,
     });
   } catch (error) {
-    res.status(400).json({
+    return res.status(400).json({
       error: true,
       message: "Upload user profile failed",
       debug: error.message,
